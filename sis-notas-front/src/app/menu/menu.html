@@ -1,0 +1,18 @@
+<nav [ngStyle]="{ 'background-color': menuColor }" class="menu-container">
+  
+  <span class="menu-title">SisNotas</span>
+
+  <div class="menu-right">
+    <span class="profile-icon">👤</span>
+
+    <div class="user-info">
+      <span class="role">{{ userRole }}:</span>
+      <span class="email">{{ userEmail }}</span>
+    </div>
+
+    <button class="logout-btn" (click)="logout()">
+      🚪 Sair
+    </button>
+  </div>
+
+</nav>

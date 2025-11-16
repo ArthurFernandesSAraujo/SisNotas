@@ -1,0 +1,57 @@
+<div class="login-container">
+  <div class="logo">
+    <img src="assets/Sis-notas-img-login.png" alt="logo">
+  </div>
+
+  <form class="login-form" [formGroup]="formGroup">
+
+    <!-- E-mail -->
+    <mat-form-field appearance="outline">
+      <mat-label>E-mail</mat-label>
+      <input matInput type="email" formControlName="email">
+
+      <mat-error *ngIf="email?.invalid && (email?.touched || email?.dirty)" color="warn">
+        E-mail é obrigatório ou inválido.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Senha -->
+    <mat-form-field appearance="outline">
+      <mat-label>Senha</mat-label>
+      <input matInput type="password" formControlName="senha">
+
+      <mat-error *ngIf="senha?.invalid && (senha?.touched || senha?.dirty)" color="warn">
+        Senha é obrigatória.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Perfil -->
+    <mat-form-field appearance="outline">
+      <mat-label>Perfil</mat-label>
+      <mat-select panelClass="painel-select" formControlName="perfil">
+        <mat-option value="secretaria">Secretaria</mat-option>
+        <mat-option value="professor">Professor</mat-option>
+        <mat-option value="aluno">Aluno</mat-option>
+      </mat-select>
+
+      <mat-error *ngIf="perfil?.invalid && (perfil?.touched || perfil?.dirty)" color="warn">
+        Selecione um perfil.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Botões -->
+    <button
+      mat-raised-button
+      color="primary"
+      class="btn-login"
+      (click)="redirectFunction()"
+      [disabled]="formGroup.invalid"
+    >
+      Entrar
+    </button>
+
+    <button mat-raised-button color="warn" class="btn-esqueci-senha">
+      Esqueci minha senha
+    </button>
+  </form>
+</div>

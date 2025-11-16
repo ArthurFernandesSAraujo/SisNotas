@@ -1,1 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.painel-select {
+  z-index: 999999 !important;
+  background: #ffffff !important; /* Ou roxo claro */
+}
+
+/* Painel REAL do dropdown */
+.mat-select-panel {
+  z-index: 999999 !important;
+  background: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15) !important;
+}
+
+.filter-class {
+  --mdc-outlined-text-field-container-shape: 12px !important;   /* bordas arredondadas */
+  --mdc-outlined-text-field-outline-width: 1px;
+}
