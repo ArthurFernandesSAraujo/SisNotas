@@ -1,0 +1,30 @@
+.container {
+  padding: 0 40px;
+  margin-top: 20px;
+}
+
+.card {
+  padding: 20px;
+  border: 1px solid #2980b9;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tabela-container {
+  margin-top: 15px;
+  overflow-x: auto;
+}
+
+.mat-table {
+  width: 100%;
+}
+
+.mat-table input {
+  width: 60px;
+}
+
+.mat-table button {
+  height: 36px;
+  min-width: 36px;
+}
