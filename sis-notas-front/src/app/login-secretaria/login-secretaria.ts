@@ -55,8 +55,6 @@ interface Aluno {
 })
 export class LoginSecretaria implements OnInit {
 
-  public usuarioName!: string;
-
   // FILTROS
   filtroProfessor = '';
   filtroAluno = '';
@@ -75,8 +73,6 @@ export class LoginSecretaria implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.usuarioName = sessionStorage.getItem('email') || '';
-
     this.carregarProfessores();
     this.carregarAlunos();
   }
@@ -130,4 +126,21 @@ export class LoginSecretaria implements OnInit {
       }
     });
   }
+
+  excluirAluno(){
+
+  }
+
+  editarAluno(){
+
+  }
+
+  excluirProfessor(){
+
+  }
+
+  editarProfessor(){
+
+  }
+
 }

@@ -1,0 +1,138 @@
+.dashboard-container {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 5px 40px;
+}
+
+.card {
+  flex: 1;
+  padding: 20px;
+  border: 1px solid #27ae60;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.conteudo-desempenho {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.progress-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.progress-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(#4caf50 calc(var(--value) * 1%), #ddd 0);
+}
+
+.inner-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.texto-desempenho {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.frase-motivacional {
+  font-size: 16px;
+  margin: 0;
+}
+
+.situacao {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.aprovado {
+  color: #27ae60; /* VERDE */
+}
+
+.reprovado {
+  color: #e74c3c; /* VERMELHO */
+}
+
+.disciplinas-container {
+  margin-top: 20px;
+}
+
+.tabela-disciplinas {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tabela-disciplinas th {
+  background: #27ae60;
+  color: white;
+  text-align: left;
+  padding: 14px;
+  font-size: 16px;
+}
+
+.tabela-disciplinas td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+}
+
+.tabela-disciplinas tr:last-child td {
+  border-bottom: none;
+}
+
+.tabela-disciplinas tr:hover {
+  background: #f5f5f5;
+}
+
+/* Estilo da nota */
+.nota-alta {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+.nota-media {
+  color: #f1c40f;
+  font-weight: bold;
+}
+
+.nota-baixa {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* situação */
+.ap {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+.rp {
+  color: #e74c3c;
+  font-weight: bold;
+}

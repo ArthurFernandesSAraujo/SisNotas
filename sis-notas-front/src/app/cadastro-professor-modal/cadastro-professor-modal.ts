@@ -29,9 +29,11 @@ export class CadastroProfessorModal {
   ) {
     this.formGroup = this.fb.group({
       nome: ['', Validators.required],
-      disciplina: ['', Validators.required],
       telefone: ['', Validators.required],
-      status: ['Ativo', Validators.required]
+      senha: ['', Validators.required],
+      email: ['', Validators.required, Validators.email],
+      status: ['Ativo', Validators.required],
+      senhaConfirmar: ['', Validators.required]
     });
   }
 
