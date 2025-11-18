@@ -58,17 +58,24 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
-Configurações do Backend:
-Comandos para conseguir fazer as configurações do python para rodar o projeto:
+## Configurações do Backend:
+
+## Comandos para conseguir fazer as configurações do python para rodar o projeto:        
+```bash
 pip install fastapi uvicorn pymysql python-dotenv
 pip install pymysql
-pip install requirements.txt               
+pip install requirements.txt 
+```
+## Para iniciar o banco de dados totalmente configurado 
 
-Para iniciar o banco de dados totalmente configurado já é sou rodar:
+```bash
 python init_db.py
+```
 
-Para rodar o backend :
+## Para rodar o backend
+```bash
 uvicorn main:app --reload
-
+```
 
  
+
