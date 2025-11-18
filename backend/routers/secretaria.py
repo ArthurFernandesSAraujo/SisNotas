@@ -1,50 +1,110 @@
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from database import conectar_bd, fechar_bd
 
 router = APIRouter(prefix="/secretaria", tags=["Secretaria / Admin"])
 
+# =============================================
+#       MODELOS JSON (Pydantic)
+# =============================================
 
-# =============================================================
-# 1) CRUD PROFESSORES
-# =============================================================
+class ProfessorCreate(BaseModel):
+    nome: str
+    email: str
+    usuario: str
+    senha: str
+
+class AlunoIn(BaseModel):
+    nome: str
+    matricula: str
+    email: str
+
+
+# =============================================
+#  PROFESSORES
+# =============================================
 
 @router.get("/professores")
 def listar_professores():
     con, cur = conectar_bd()
-    cur.execute("SELECT * FROM professores")
+    cur.execute("""
+        SELECT idprofessor, nome, email 
+        FROM professores
+    """)
     data = cur.fetchall()
     fechar_bd(con, cur)
     return data
 
+
 @router.post("/professores")
-def cadastrar_professor(nome: str, email: str):
+def cadastrar_professor(data: ProfessorCreate):
     con, cur = conectar_bd()
-    cur.execute("INSERT INTO professores (nome, email) VALUES (%s, %s)", (nome, email))
+
+    # Cria usuário para login
+    cur.execute("""
+        INSERT INTO usuarios (nome, username, senha, nivel)
+        VALUES (%s, %s, %s, 'professor')
+    """, (data.nome, data.usuario, data.senha))
+
+    # Cadastra professor (SEM telefone e SEM idusuario)
+    cur.execute("""
+        INSERT INTO professores (nome, email)
+        VALUES (%s, %s)
+    """, (data.nome, data.email))
+
     con.commit()
     fechar_bd(con, cur)
-    return {"msg": "Professor cadastrado com sucesso"}
+    return {"msg": "Professor cadastrado com sucesso!"}
+
 
 @router.put("/professores/{idprofessor}")
-def atualizar_professor(idprofessor: int, nome: str, email: str):
+def atualizar_professor(idprofessor: int, data: ProfessorCreate):
     con, cur = conectar_bd()
-    cur.execute("UPDATE professores SET nome=%s, email=%s WHERE idprofessor=%s",
-                (nome, email, idprofessor))
+
+    cur.execute("""
+        UPDATE professores
+        SET nome=%s, email=%s
+        WHERE idprofessor=%s
+    """, (data.nome, data.email, idprofessor))
+
+    # Atualiza usuário correspondente pelo nome
+    cur.execute("""
+        UPDATE usuarios
+        SET username=%s, senha=%s
+        WHERE nome=%s AND nivel='professor'
+    """, (data.usuario, data.senha, data.nome))
+
     con.commit()
     fechar_bd(con, cur)
-    return {"msg": "Professor atualizado com sucesso"}
+    return {"msg": "Professor atualizado com sucesso!"}
+
 
 @router.delete("/professores/{idprofessor}")
 def excluir_professor(idprofessor: int):
     con, cur = conectar_bd()
+
+    # pega nome para excluir usuário correspondente
+    cur.execute("SELECT nome FROM professores WHERE idprofessor=%s", (idprofessor,))
+    row = cur.fetchone()
+
+    if not row:
+        fechar_bd(con, cur)
+        raise HTTPException(status_code=404, detail="Professor não encontrado")
+
+    nome_prof = row["nome"]
+
     cur.execute("DELETE FROM professores WHERE idprofessor=%s", (idprofessor,))
+    cur.execute("DELETE FROM usuarios WHERE nome=%s AND nivel='professor'", (nome_prof,))
+
     con.commit()
     fechar_bd(con, cur)
-    return {"msg": "Professor excluído com sucesso"}
+    return {"msg": "Professor excluído com sucesso!"}
 
 
-# =============================================================
-# 2) CRUD ALUNOS
-# =============================================================
+
+# =============================================
+#  ALUNOS
+# =============================================
 
 @router.get("/alunos")
 def listar_alunos():
@@ -54,27 +114,31 @@ def listar_alunos():
     fechar_bd(con, cur)
     return data
 
+
 @router.post("/alunos")
-def cadastrar_aluno(nome: str, matricula: str, email: str):
+def cadastrar_aluno(data: AlunoIn):
     con, cur = conectar_bd()
-    cur.execute(
-        "INSERT INTO alunos (nome, matricula, email) VALUES (%s, %s, %s)",
-        (nome, matricula, email)
-    )
+    cur.execute("""
+        INSERT INTO alunos (nome, matricula, email)
+        VALUES (%s, %s, %s)
+    """, (data.nome, data.matricula, data.email))
     con.commit()
     fechar_bd(con, cur)
     return {"msg": "Aluno cadastrado com sucesso"}
 
+
 @router.put("/alunos/{idaluno}")
-def atualizar_aluno(idaluno: int, nome: str, matricula: str, email: str):
+def atualizar_aluno(idaluno: int, data: AlunoIn):
     con, cur = conectar_bd()
-    cur.execute(
-        "UPDATE alunos SET nome=%s, matricula=%s, email=%s WHERE idaluno=%s",
-        (nome, matricula, email, idaluno)
-    )
+    cur.execute("""
+        UPDATE alunos
+        SET nome=%s, matricula=%s, email=%s
+        WHERE idaluno=%s
+    """, (data.nome, data.matricula, data.email, idaluno))
     con.commit()
     fechar_bd(con, cur)
     return {"msg": "Aluno atualizado com sucesso"}
+
 
 @router.delete("/alunos/{idaluno}")
 def excluir_aluno(idaluno: int):
@@ -83,115 +147,3 @@ def excluir_aluno(idaluno: int):
     con.commit()
     fechar_bd(con, cur)
     return {"msg": "Aluno excluído com sucesso"}
-
-
-# =============================================================
-# 3) CRUD MATÉRIAS
-# =============================================================
-
-@router.get("/materias")
-def listar_materias():
-    con, cur = conectar_bd()
-    cur.execute("""
-        SELECT m.*, p.nome AS professor
-        FROM materias m
-        LEFT JOIN professores p ON m.idprofessor = p.idprofessor
-    """)
-    data = cur.fetchall()
-    fechar_bd(con, cur)
-    return data
-
-@router.post("/materias")
-def cadastrar_materia(nome: str):
-    con, cur = conectar_bd()
-    cur.execute("INSERT INTO materias (nome) VALUES (%s)", (nome,))
-    con.commit()
-    fechar_bd(con, cur)
-    return {"msg": "Matéria cadastrada com sucesso"}
-
-@router.put("/materias/{idmateria}")
-def atualizar_materia(idmateria: int, nome: str):
-    con, cur = conectar_bd()
-    cur.execute("UPDATE materias SET nome=%s WHERE idmateria=%s", (nome, idmateria))
-    con.commit()
-    fechar_bd(con, cur)
-    return {"msg": "Matéria atualizada com sucesso"}
-
-@router.delete("/materias/{idmateria}")
-def excluir_materia(idmateria: int):
-    con, cur = conectar_bd()
-    cur.execute("DELETE FROM materias WHERE idmateria=%s", (idmateria,))
-    con.commit()
-    fechar_bd(con, cur)
-    return {"msg": "Matéria excluída com sucesso"}
-
-
-# =============================================================
-# 4) NOTAS — Secretaria pode fazer tudo
-# =============================================================
-
-@router.get("/notas")
-def listar_notas():
-    con, cur = conectar_bd()
-    cur.execute("""
-        SELECT n.idnota, a.nome AS aluno, m.nome AS materia, p.nome AS professor, n.nota
-        FROM notas n
-        JOIN alunos a ON n.idaluno = a.idaluno
-        JOIN materias m ON n.idmateria = m.idmateria
-        JOIN professores p ON n.idprofessor = p.idprofessor
-    """)
-    data = cur.fetchall()
-    fechar_bd(con, cur)
-    return data
-
-@router.post("/notas")
-def lançar_nota(idaluno: int, idmateria: int, idprofessor: int, nota: float):
-    con, cur = conectar_bd()
-    cur.execute("""
-        INSERT INTO notas (idaluno, idmateria, idprofessor, nota)
-        VALUES (%s, %s, %s, %s)
-    """, (idaluno, idmateria, idprofessor, nota))
-    con.commit()
-    fechar_bd(con, cur)
-    return {"msg": "Nota lançada com sucesso"}
-
-@router.put("/notas/{idnota}")
-def atualizar_nota(idnota: int, nota: float):
-    con, cur = conectar_bd()
-    cur.execute("UPDATE notas SET nota=%s WHERE idnota=%s", (nota, idnota))
-    con.commit()
-    fechar_bd(con, cur)
-    return {"msg": "Nota atualizada com sucesso"}
-
-@router.delete("/notas/{idnota}")
-def excluir_nota(idnota: int):
-    con, cur = conectar_bd()
-    cur.execute("DELETE FROM notas WHERE idnota=%s", (idnota,))
-    con.commit()
-    fechar_bd(con, cur)
-    return {"msg": "Nota excluída com sucesso"}
-
-
-# =============================================================
-# 5) ASSOCIAÇÕES
-# =============================================================
-
-@router.post("/associar/aluno-materia")
-def associar_aluno_materia(idaluno: int, idmateria: int):
-    con, cur = conectar_bd()
-    cur.execute("INSERT IGNORE INTO aluno_materias (idaluno, idmateria) VALUES (%s, %s)",
-                (idaluno, idmateria))
-    con.commit()
-    fechar_bd(con, cur)
-    return {"msg": "Aluno associado à matéria"}
-
-@router.post("/associar/professor-materia")
-def associar_professor_materia(idprofessor: int, idmateria: int):
-    con, cur = conectar_bd()
-    cur.execute(
-        "UPDATE materias SET idprofessor=%s WHERE idmateria=%s",
-        (idprofessor, idmateria)
-    )
-    con.commit()
-    fechar_bd(con, cur)
-    return {"msg": "Professor associado à matéria"}
