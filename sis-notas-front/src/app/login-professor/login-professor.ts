@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Menu } from '../menu/menu';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
+import { ProfessorService } from '../service/professor.service';
 
 @Component({
   selector: 'app-login-professor',
@@ -36,24 +39,121 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class LoginProfessor implements OnInit {
 
-  displayedColumns = ['id', 'nome', 'disciplina', 'status', 'nota'];
+  displayedColumns = ['id', 'nome', 'nota'];
 
-  // Simulando dados de um endpoint
-  dataSource = [
-    { id: 1, nome: 'João', disciplina: 'Matemática', status: 'Ativo', nota: null },
-    { id: 2, nome: 'Maria', disciplina: 'Português', status: 'Ativo', nota: 7 },
-    { id: 3, nome: 'Carlos', disciplina: 'História', status: 'Ativo', nota: null }
-  ];
+  materias: any[] = [];
+  alunos: any[] = [];
+  materiaSelecionada: number | null = null;
 
-  ngOnInit(): void {}
+  idProfessorLogado: number = 0;
 
-  salvarNota(aluno: any) {
-    if (aluno.nota !== null && aluno.nota !== undefined) {
-      console.log(`Salvando nota do aluno ${aluno.nome}: ${aluno.nota}`);
-      alert(`Nota do ${aluno.nome} salva: ${aluno.nota}`);
-      // Aqui você chamaria o endpoint real via HttpClient
+  constructor(private professorService: ProfessorService) {}
+
+  // ========================================================
+  // GARANTE QUE ESTAMOS NO NAVEGADOR (SSR/VITE SAFE)
+  // ========================================================
+  isBrowser(): boolean {
+    return typeof window !== 'undefined' && typeof sessionStorage !== 'undefined';
+  }
+
+  ngOnInit(): void {
+    this.pegarProfessorLogado();
+  }
+
+  // ========================================================
+  // PEGAR O ID DO PROFESSOR LOGADO NO SESSIONSTORAGE
+  // ========================================================
+  pegarProfessorLogado() {
+    if (!this.isBrowser()) {
+      console.warn("⚠ sessionStorage não está disponível (SSR/Vite)");
+      return;
+    }
+
+    const usuario = sessionStorage.getItem("usuario");
+
+    if (usuario) {
+      const obj = JSON.parse(usuario);
+      console.log("Objeto do usuário logado:", obj);
+      this.idProfessorLogado = obj.id;  // agora pega o ID correto
     } else {
-      alert(`Digite uma nota válida para ${aluno.nome}`);
+      this.idProfessorLogado = 0;
+    }
+
+    console.log("Professor logado:", this.idProfessorLogado);
+
+    if (!!this.idProfessorLogado) {
+      this.carregarMateriasDoProfessor(this.idProfessorLogado);
     }
   }
+
+  // ========================================================
+  // CARREGAR MATÉRIAS DO PROFESSOR LOGADO
+  // ========================================================
+  carregarMateriasDoProfessor(id: any) {
+    this.professorService.materiasDoProfessor(id)
+      .subscribe({
+        next: (res) => {
+
+          // MAPEIA PARA O FORMATO CORRETO DO DROPDOWN
+          this.materias = res.map((m: any) => ({
+            idmateria: m.idmateria,
+            nome: m.nome
+          }));
+
+          console.log("Matérias carregadas:", this.materias);
+        },
+        error: () => alert("Erro ao carregar matérias do professor!")
+      });
+  }
+
+  // ========================================================
+  // CARREGAR ALUNOS AO TROCAR A MATÉRIA
+  // ========================================================
+  carregarAlunosDaMateria() {
+
+    console.log('entrou')
+    if (!this.materiaSelecionada) {
+      this.alunos = [];
+      return;
+    }
+
+    console.log(this.idProfessorLogado)
+    console.log(this.materiaSelecionada)
+
+    this.professorService.alunosDaMateria(
+      this.idProfessorLogado,
+      this.materiaSelecionada
+    ).subscribe({
+      next: (res) => {
+        this.alunos = res;
+        console.log("Alunos carregados:", res);
+      },
+      error: () => alert("Erro ao carregar alunos!")
+    });
+  }
+
+  // ========================================================
+  // SALVAR NOTA DO ALUNO
+  // ========================================================
+  salvarNota(aluno: any) {
+    if (!this.materiaSelecionada) {
+      alert("Escolha uma matéria primeiro!");
+      return;
+    }
+
+    if (aluno.nota === null || aluno.nota === undefined || aluno.nota === "") {
+      alert("Digite uma nota válida!");
+      return;
+    }
+
+    this.professorService.salvarNota(
+      aluno.idaluno,
+      this.materiaSelecionada,
+      aluno.nota
+    ).subscribe({
+      next: () => alert(`Nota salva com sucesso para ${aluno.nome}!`),
+      error: () => alert("Erro ao salvar nota!")
+    });
+  }
+
 }

@@ -17,23 +17,23 @@ import { MatDialogRef, MatDialogActions, MatDialogContent } from '@angular/mater
     MatButtonModule,
     MatDialogActions,
     MatDialogContent
-],
+  ],
   templateUrl: './cadastro-professor-modal.html',
 })
 export class CadastroProfessorModal {
+
   formGroup: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<CadastroProfessorModal>
   ) {
+
     this.formGroup = this.fb.group({
       nome: ['', Validators.required],
-      telefone: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      usuario: ['', Validators.required],
       senha: ['', Validators.required],
-      email: ['', Validators.required, Validators.email],
-      status: ['Ativo', Validators.required],
-      senhaConfirmar: ['', Validators.required]
     });
   }
 

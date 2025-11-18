@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { CadastroProfessorModal } from '../cadastro-professor-modal/cadastro-professor-modal';
 
 @Component({
   selector: 'app-cadastro-aluno-modal',
@@ -18,25 +17,22 @@ import { CadastroProfessorModal } from '../cadastro-professor-modal/cadastro-pro
     MatButtonModule,
     MatDialogActions,
     MatDialogContent
-],
+  ],
   templateUrl: './cadastro-aluno-modal.html',
   styleUrl: './cadastro-aluno-modal.css',
 })
 export class CadastroAlunoModal {
-   formGroup: FormGroup;
+
+  formGroup: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<CadastroProfessorModal>
+    private dialogRef: MatDialogRef<CadastroAlunoModal>
   ) {
     this.formGroup = this.fb.group({
       nome: ['', Validators.required],
-      disciplina: ['', Validators.required],
-      telefone: ['', Validators.required],
-      senha: ['', Validators.required],
-      email: ['', Validators.required, Validators.email],
-      status: ['Ativo', Validators.required],
-      senhaConfirmar: ['', Validators.required]
+      matricula: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
@@ -49,5 +45,4 @@ export class CadastroAlunoModal {
   cancelar() {
     this.dialogRef.close();
   }
-
 }

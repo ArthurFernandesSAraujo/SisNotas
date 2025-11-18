@@ -5,18 +5,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
+import { AuthService } from '../service/auth.service';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [
-    RouterOutlet,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
     ReactiveFormsModule,
-    CommonModule,
+    CommonModule
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -27,7 +28,8 @@ export class Login implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -36,42 +38,46 @@ export class Login implements OnInit {
 
   initForm() {
     this.formGroup = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', Validators.required],   // <-- CORRIGIDO AQUI
       senha: ['', Validators.required],
       perfil: ['', Validators.required]
     });
   }
 
   redirectFunction() {
-    console.log('E-mail:', this.formGroup.value.email);
-    console.log('Senha:', this.formGroup.value.senha);
-    console.log('Perfil:', this.formGroup.value.perfil);
 
-    const perfil = this.formGroup.value.perfil;
-    const email =  this.formGroup.value.email
-    const senha = this.formGroup.value.senha
+    if (this.formGroup.invalid) return;
 
-    sessionStorage.setItem('email', email);
-    sessionStorage.setItem('senha', senha);     
-    sessionStorage.setItem('perfil', perfil);
+    const credentials = {
+      username: this.formGroup.value.email,
+      senha: this.formGroup.value.senha,
+      tipo: this.formGroup.value.perfil
+    };
 
-    if (perfil === 'secretaria') sessionStorage.setItem('menuColor', '#8e44ad');
-    if (perfil === 'professor') sessionStorage.setItem('menuColor', '#2980b9');
-    if (perfil === 'aluno') sessionStorage.setItem('menuColor', '#27ae60');
+    this.authService.login(credentials).subscribe({
+      next: (user) => {
+        console.log("LOGIN OK:", user);
 
+        sessionStorage.setItem("email", this.formGroup.value.email);
+        sessionStorage.setItem("id_usuario", user.id.toString());
+        sessionStorage.setItem("token", user.token);
+        sessionStorage.setItem("usuario", JSON.stringify(user.nome));
+        sessionStorage.setItem("perfil", user.nivel);
 
-    if (perfil == 'secretaria') {
-      this.router.navigate(['/pagina-secretaria']);
-    }
+        if (user.nivel === 'secretaria') sessionStorage.setItem('menuColor', '#8e44ad');
+        if (user.nivel === 'professor') sessionStorage.setItem('menuColor', '#2980b9');
+        if (user.nivel === 'aluno') sessionStorage.setItem('menuColor', '#27ae60');
 
-    if (perfil === 'professor') {
-      this.router.navigate(['/pagina-professor']);
-    }
+        if (user.nivel === 'secretaria') this.router.navigate(['/pagina-secretaria']);
+        if (user.nivel === 'professor') this.router.navigate(['/pagina-professor']);
+        if (user.nivel === 'aluno') this.router.navigate(['/pagina-aluno']);
+      },
 
-    if (perfil === 'aluno') {
-      this.router.navigate(['/pagina-aluno']);
-    }
-    
+      error: (err) => {
+        console.error("ERRO NO LOGIN:", err);
+        alert(err.error.detail || "Erro ao fazer login");
+      }
+    });
   }
 
   get email() { return this.formGroup.get('email'); }

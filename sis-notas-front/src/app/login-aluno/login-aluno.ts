@@ -30,13 +30,9 @@ export class LoginAluno implements OnInit{
    buscarDados() {
     setTimeout(() => {
       const dadosAPI = {
-        mediaGeral: 7.2,
+        mediaGeral: 5.4,
         disciplinas: [
-          { nome: 'Matemática', nota: 8.5 },
-          { nome: 'História', nota: 6.0 },
-          { nome: 'Geografia', nota: 4.5 },
-          { nome: 'Português', nota: 7.2 },
-          { nome: 'Física', nota: 5.4 }
+          { nome: 'Geografia', nota: 5.4 }
         ]
       };
 

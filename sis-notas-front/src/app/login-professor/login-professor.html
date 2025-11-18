@@ -1,46 +1,54 @@
 <app-menu></app-menu>
 
-<h1 style="padding-left: 40px;">Bem Vindo Professor(a)!</h1>
-<h2 style="padding-left: 40px;">Lançar Notas:</h2>
+<h1 style="padding-left: 40px;">Bem-vindo Professor(a)!</h1>
+<h2 style="padding-left: 40px;">Lançar Notas</h2>
 
 <div class="container mt-4">
+
+  <!-- Seleção de matéria -->
   <div class="card">
-    <h3>Notas por Disciplina</h3>
+    <h3>Selecione a Matéria</h3>
+
+    <mat-form-field appearance="outline" panelClass="painel-select" style="width: 300px;">
+      <mat-label>Matéria</mat-label>
+
+      <mat-select [(ngModel)]="materiaSelecionada"
+                  (selectionChange)="carregarAlunosDaMateria()">
+
+        <mat-option *ngFor="let m of materias" [value]="m.idmateria">
+          {{ m.nome }}
+        </mat-option>
+
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Tabela de alunos -->
+  <div class="card" *ngIf="materiaSelecionada">
+    <h3>Alunos da Matéria</h3>
 
     <div class="tabela-container">
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z2">
+      <table mat-table [dataSource]="alunos" class="mat-elevation-z2">
 
-        <!-- ID -->
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>ID</th>
-          <td mat-cell *matCellDef="let e">{{ e.id }}</td>
+          <td mat-cell *matCellDef="let a">{{ a.idaluno }}</td>
         </ng-container>
 
-        <!-- Nome -->
         <ng-container matColumnDef="nome">
           <th mat-header-cell *matHeaderCellDef>Nome do Aluno</th>
-          <td mat-cell *matCellDef="let e">{{ e.nome }}</td>
+          <td mat-cell *matCellDef="let a">{{ a.nome }}</td>
         </ng-container>
 
-        <!-- Disciplina -->
-        <ng-container matColumnDef="disciplina">
-          <th mat-header-cell *matHeaderCellDef>Disciplina</th>
-          <td mat-cell *matCellDef="let e">{{ e.disciplina }}</td>
-        </ng-container>
-
-        <!-- Status -->
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
-          <td mat-cell *matCellDef="let e">{{ e.status }}</td>
-        </ng-container>
-
-        <!-- Nota -->
         <ng-container matColumnDef="nota">
           <th mat-header-cell *matHeaderCellDef>Nota</th>
-          <td mat-cell *matCellDef="let aluno">
+          <td mat-cell *matCellDef="let a">
             <div style="display:flex; align-items:center; gap:5px;">
-              <input matInput type="number" min="0" max="10" [(ngModel)]="aluno.nota" placeholder="Nota">
-              <button mat-icon-button color="primary" (click)="salvarNota(aluno)" matTooltip="Salvar">
+              <input matInput type="number" min="0" max="10"
+                     [(ngModel)]="a.nota">
+
+              <button mat-icon-button color="primary"
+                      (click)="salvarNota(a)">
                 <mat-icon>save</mat-icon>
               </button>
             </div>
@@ -49,6 +57,7 @@
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
       </table>
     </div>
   </div>
