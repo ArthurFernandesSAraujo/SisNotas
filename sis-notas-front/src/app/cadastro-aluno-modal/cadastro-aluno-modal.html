@@ -1,0 +1,38 @@
+<h2 style="padding-left: 10px;" mat-dialog-title>Cadastrar Aluno</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="formGroup">
+
+    <!-- Nome -->
+    <div class="col-12">
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome">
+      </mat-form-field>
+    </div>
+
+    <!-- Matrícula -->
+    <div class="col-12">
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Matrícula</mat-label>
+        <input matInput formControlName="matricula">
+      </mat-form-field>
+    </div>
+
+    <!-- Email -->
+    <div class="col-12">
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email">
+      </mat-form-field>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="salvar()" [disabled]="formGroup.invalid">
+    Salvar
+  </button>
+</mat-dialog-actions>

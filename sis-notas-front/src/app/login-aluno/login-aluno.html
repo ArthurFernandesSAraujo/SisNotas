@@ -1,0 +1,85 @@
+<app-menu></app-menu>
+
+<h1 style="padding-left: 40px;">Bem Vindo Aluno(a)!</h1>
+
+<div class="container mt-4">
+  <div class="dashboard-container">
+
+    <div class="card">
+      <h3>Resumo do Desempenho:</h3>
+
+      <div class="conteudo-desempenho">
+
+        <div class="progress-wrapper">
+          <div class="progress-circle" [style.--value]="valor * 10"></div>
+          <div class="inner-circle">
+            <span>{{ valor }}/10</span>
+          </div>
+        </div>
+
+        <div class="texto-desempenho">
+          <p class="situacao">
+            Situação atual:
+            <span [ngClass]="valor >= 6 ? 'aprovado' : 'reprovado'">
+              {{ valor >= 6 ? 'Aprovado' : 'Reprovado' }}
+            </span>
+          </p>
+
+          <p *ngIf="valor < 6" class="frase-motivacional">
+            Continue se dedicando para melhorar sua média! br>
+            Para mais informações contator o professor
+          </p>
+
+          <p *ngIf="valor > 5" class="frase-motivacional">
+            Parabens você esta aprovado! <br>
+            Para mais informações contator o professor
+          </p>
+
+        </div>
+
+      </div>
+    </div>
+   <div class="card">
+    <h3>Notas por Disciplina:</h3>
+
+    <div class="disciplinas-container">
+
+        <table class="tabela-disciplinas">
+        <thead>
+            <tr>
+            <th>Disciplina</th>
+            <th>Nota</th>
+            <th>Situação</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let item of disciplinas">
+            <td>{{ item.nome }}</td>
+
+            <td>
+                <span [ngClass]="{ 
+                    'nota-alta': item.nota >= 7,
+                    'nota-media': item.nota >= 5 && item.nota < 7,
+                    'nota-baixa': item.nota < 5
+                }">
+                {{ item.nota }}
+                </span>
+            </td>
+
+            <td>
+                <span [ngClass]="{
+                    'ap': item.nota >= 6,
+                    'rp': item.nota < 6
+                }">
+                {{ item.nota >= 6 ? 'Aprovado' : 'Reprovado' }}
+                </span>
+            </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+    </div>
+
+  </div>
+</div>
